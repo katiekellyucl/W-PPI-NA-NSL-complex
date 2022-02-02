@@ -1,0 +1,282 @@
+Author: Katie Kelly
+Date: 02.02.22
+
+
+#Upload libraries:------------------------------------------------------------------------------------------------------------------------------------
+
+library(dplyr)
+library(tidyverse)
+library(ggplot2)
+
+#Import the dictionary
+conversion_table <- read.csv("~/PhD_Bioinformatics /conversion_table.csv")
+
+#Import data (.csv files) for PINOT, HIPPIE and MIST output files (post-QC and standardisation of MIST and HIPPIE files)--------------------------------------------------------
+
+
+PINOT_FLI <- read.csv("~/PhD_Bioinformatics /PINOT1 /PINOT_FULLLIST.csv")
+PINOT_FLI <- PINOT_FLI[c("NameA","NameB","EntrezB","Final.Score")]                                   #subsets for relevant dataframe columns 
+colnames(PINOT_FLI) <- c("Seed", "Interactor","Interactor_EntrezID","PINOT_score")                   #Renames columns
+
+
+HIPPIE_FLI <- read.csv("~/PhD_Bioinformatics /HIPPIE1/HIPPIE_FULLLIST_MODIFIED.csv")
+HIPPIE_FLI <- HIPPIE_FLI[c("Alt.IDs.Interactor.A","Alt.IDs.Interactor.B","ID.Interactor.B", "Confidence.Value")]         #subsets for relevant dataframe columns 
+colnames(HIPPIE_FLI) <- c("Seed", "Interactor","Interactor_EntrezID","HIPPIE_score")                                     #Renames columns                                                 #Renames columns
+
+#Note- post QC columns 'PubMed ID', 'Source Databases', 'Direct' and 'Indirect' are removed, to resolve formatting differences. 
+
+MIST_FLI <- read.csv("~/PhD_Bioinformatics /MIST1/MISTFULLLIST_PostQC.csv")
+MIST_FLI <- MIST_FLI[c("Symbol A","ID.Interactor.B","Entrez GeneID B", "rank")]         #subsets for relevant dataframe columns 
+colnames(MIST_FLI) <- c("Seed", "Interactor","Interactor_EntrezID","MIST_score")        #Renames columns                                  
+
+
+#Subsets PINOT gene list according to Seed & saves files (as .csv) -------------------------------------------------------------------------------------------------------------
+                          
+PINOT_HCFC1 <- filter(PINOT_FLI, Seed == "HCFC1") %>% write_csv("~/PhD_Bioinformatics /PINOT1/HCFC1/PINOTHCFC1.csv")
+PINOT_KANSL2 <- filter(PINOT_FLI, Seed == "KANSL2") %>% write_csv("~/PhD_Bioinformatics /PINOT1/KANSL2/PINOTKANSL2.csv")
+PINOT_KANSL1 <- filter(PINOT_FLI, Seed == "KANSL1") %>% write_csv("~/PhD_Bioinformatics /PINOT1/KANSL1/PINOTKANSL1.csv")
+PINOT_KAT8 <- filter(PINOT_FLI, Seed == "KAT8") %>% write_csv("~/PhD_Bioinformatics /PINOT1/KAT8/PINOTKAT8.csv")
+PINOT_WDR5 <- filter(PINOT_FLI, Seed == "WDR5") %>% write_csv("~/PhD_Bioinformatics /PINOT1/WDR5/PINOTWDR5.csv")
+PINOT_MCRS1 <- filter(PINOT_FLI, Seed == "MCRS1") %>% write_csv("~/PhD_Bioinformatics /PINOT1/MCRS1/PINOTMCRS1.csv")
+PINOT_PHF20 <- filter(PINOT_FLI, Seed == "PHF20") %>% write_csv("~/PhD_Bioinformatics /PINOT1/PHF20/PINOTPHF20.csv")
+PINOT_OGT <- filter(PINOT_FLI, Seed == "OGT") %>% write_csv("~/PhD_Bioinformatics /PINOT1/OGT/PINOTOGT.csv")
+PINOT_KANSL3 <- filter(PINOT_FLI, Seed == "KANSL3") %>% write_csv("~/PhD_Bioinformatics /PINOT1/KANSL3/PINOTKANSL3.csv")
+
+
+#HIPPIE and MIST files are already subset into individual interactomes, post-QC steps.
+#Next steps carried out in Excel : Compile HIPPIE, MIST and PINOT PPI data for each interactome. 
+###Files Saved in: '~/PhD_Bioinformatics /Interactomes_merged/'SEEDNAME'/'SEEDNAME_Interactome.csv'
+
+
+#Create reference list for each interactome. Contains full list of unique interactors captured across the 3 tools -----------------------------------------------------------------------------------------------------------
+#KAT8
+KAT8_Ref <- read.csv("~/PhD_Bioinformatics /Interactomes_merged/KAT8/KAT8_Interactome.csv")
+KAT8_Ref <- KAT8_Ref[-c(2,3)] 
+KAT8_Ref <- KAT8_Ref [!duplicated(KAT8_Ref $Interactor_EntrezID), ]                                                         #Removes the duplicate entries based on Interactor Entrez ID.
+KAT8_Ref <- as.data.frame(KAT8_Ref)
+readr::write_csv(KAT8_Ref, file =("~/PhD_Bioinformatics /Interactomes_merged/KAT8/KAT8_ref.csv")) # save results as CSV
+
+#KANSL1
+KANSL1_Ref <- read.csv("~/PhD_Bioinformatics /Interactomes_merged/KANSL1/KANSL1_Interactome.csv")
+KANSL1_Ref <- KANSL1_Ref[-c(2,3)] 
+KANSL1_Ref <- KANSL1_Ref [!duplicated(KANSL1_Ref $Interactor_EntrezID), ]  #Removes the duplicate entries based on Interactor Entrez ID.
+KANSL1_Ref <- as.data.frame(KANSL1_Ref)
+readr::write_csv(KANSL1_Ref, file =("~/PhD_Bioinformatics /Interactomes_merged/KANSL1/KANSL1_ref.csv")) # save results as CSV
+
+
+#KANSL2
+KANSL2_Ref <- read.csv("~/PhD_Bioinformatics /Interactomes_merged/KANSL2/KANSL2_Interactome.csv")
+KANSL2_Ref <- KANSL2_Ref[-c(2,3)] 
+KANSL2_Ref <- KANSL2_Ref [!duplicated(KANSL2_Ref $Interactor_EntrezID), ]
+KANSL2_Ref <- as.data.frame(KANSL2_Ref)
+readr::write_csv(KANSL2_Ref, file =("~/PhD_Bioinformatics /Interactomes_merged/KANSL2/KANSL2_ref.csv")) # save results as CSV
+
+
+#KANSL3
+KANSL3_Ref <- read.csv("~/PhD_Bioinformatics /Interactomes_merged/KANSL3/KANSL3_Interactome.csv")
+KANSL3_Ref <- KANSL3_Ref[-c(2,3)] 
+KANSL3_Ref <- KANSL3_Ref [!duplicated(KANSL3_Ref $Interactor_Gene_ID), ]
+KANSL3_Ref <- as.data.frame(KANSL3_Ref)
+readr::write_csv(KANSL3_Ref, file =("~/PhD_Bioinformatics /Interactomes_merged/KANSL3/KANSL3_ref.csv")) # save results as CSV
+
+#HCFC1
+HCFC1_Ref <- read.csv("~/PhD_Bioinformatics /Interactomes_merged/HCFC1/HCFC1_Interactome.csv")
+HCFC1_Ref <- HCFC1_Ref[-c(2,3)] 
+HCFC1_Ref <- HCFC1_Ref [!duplicated(HCFC1_Ref $Interactor_EntrezID), ]
+HCFC1_Ref <- as.data.frame(HCFC1_Ref)
+readr::write_csv(HCFC1_Ref, file =("~/PhD_Bioinformatics /Interactomes_merged/HCFC1/HCFC1_ref.csv")) # save results as CSV
+
+#MCRS1
+MCRS1_Ref <- read.csv("~/PhD_Bioinformatics /Interactomes_merged/MCRS1/MCRS1_Interactome.csv")
+MCRS1_Ref <- MCRS1_Ref[-c(2,3)] 
+MCRS1_Ref <- MCRS1_Ref [!duplicated(MCRS1_Ref $Interactor_EntrezID), ]
+MCRS1_Ref <- as.data.frame(MCRS1_Ref)
+readr::write_csv(MCRS1_Ref, file =("~/PhD_Bioinformatics /Interactomes_merged/MCRS1/MCRS1_ref.csv")) # save results as CSV
+
+
+#OGT
+OGT_Ref <- read.csv("~/PhD_Bioinformatics /Interactomes_merged/OGT/OGT_Interactome.csv")
+OGT_Ref <- OGT_Ref[-c(2,3] 
+OGT_Ref <- OGT_Ref [!duplicated(OGT_Ref $Interactor_Gene_ID), ]
+OGT_Ref <- as.data.frame(OGT_Ref)
+readr::write_csv(OGT_Ref, file =("~/PhD_Bioinformatics /Interactomes_merged/OGT/OGT_ref.csv")) # save results as CSV
+
+
+#PHF20
+PHF20_Ref <- read.csv("~/PhD_Bioinformatics /Interactomes_merged/PHF20/PHF20_Interactome.csv")
+PHF20_Ref <-PHF20_Ref[-c(2,3)] 
+PHF20_Ref <- PHF20_Ref [!duplicated(PHF20_Ref $Interactor_EntrezID), ]
+PHF20_Ref <- as.data.frame(PHF20_Ref)
+readr::write_csv(PHF20_Ref, file =("~/PhD_Bioinformatics /Interactomes_merged/PHF20/PHF20_ref.csv")) # save results as CSV
+
+#WDR5
+WDR5_Ref <- read.csv("~/PhD_Bioinformatics /Interactomes_merged/WDR5/WDR5_Interactome.csv")
+WDR5_Ref <-WDR5_Ref[-c(2,3)] 
+WDR5_Ref <- WDR5_Ref [!duplicated(WDR5_Ref $Interactor_EntrezID), ]
+WDR5_Ref <- as.data.frame(WDR5_Ref)
+readr::write_csv(WDR5_Ref, file =("~/PhD_Bioinformatics /Interactomes_merged/WDR5/WDR5_ref.csv")) # save results as CSV
+
+
+
+
+
+
+#Standardizing the scores-------------------------------------------------------------------------------------------------------------------
+#HCFC1
+HCFC1_Ref <- read.csv("~/PhD_Bioinformatics /Scoring /HCFC1_ref_S.csv") #Calling in the reference lists for each interactomes (created using the above script)
+#Below Script calls in the .csv file for each individual interactome, for each of the tools (PINOT, MIST and HIPPIE). Make sure that the file contains the columns: "Seed", "Interactor","Interactor_EntrezID","<TOOLSPECIFIC>_score"
+
+HIPPIE_HCFC1 <- read.csv("~/PhD_Bioinformatics /Scoring /HIPPIES/HIPPIEHCFC1_S.csv")
+HIPPIE_HCFC1 <- HIPPIE_HCFC1[-c(1)]                                                #Retains the 'Interactor_EntrezID' column and '<TOOLSPECIFIC>_score'
+PINOT_HCFC1 <- read.csv("~/PhD_Bioinformatics /Scoring /PINOTS/PINOTHCFC1_S.csv")
+PINOT_HCFC1 <- PINOT_HCFC1[-c(1)]                                                  #Retains the 'Interactor_EntrezID' column and '<TOOLSPECIFIC>_score'
+MIST_HCFC1 <- read.csv("~/PhD_Bioinformatics /Scoring /MISTS/MISTHCFC1_S.csv")
+MIST_HCFC1 <- MIST_HCFC1[-c(1)]                                                    #Retains the 'Interactor_EntrezID' column and '<TOOLSPECIFIC>_score'
+
+#Following code completes merge with the reference interactor list, for the specified interactome. 
+HCFC1_Score <- merge(HCFC1_Ref, HIPPIE_HCFC1, by.x="Interactor", by.y="Interactor_EntrezID", all.x=TRUE)
+HCFC1_Score <- merge(HCFC1_Score, PINOT_HCFC1, by.x="Interactor", by.y="Interactor_EntrezID", all.x=TRUE)
+HCFC1_Score <- merge(HCFC1_Score, MIST_HCFC1, by.x="Interactor", by.y="Interactor_EntrezID", all.x=TRUE)
+
+#Output file contains columns 'Interactor', 'Interactor_EntrezID', 'PINOT_score', 'HIPPIE_score' and 'MIST_score'.
+readr::write_csv(HCFC1_Score, file =("~/PhD_Bioinformatics /Scoring /Raw_Score_Merge/HCFC1_Score_Merge.csv")) # save results as CSV
+
+#Following code repeats for the remaining 8 members of the NSL complex.
+
+#KAT8
+KAT8_Ref <- read.csv("~/PhD_Bioinformatics /Scoring /KAT8_ref_S.csv") 
+HIPPIE_KAT8 <- read.csv("~/PhD_Bioinformatics /Scoring /HIPPIES/HIPPIEKAT8_S.csv")
+HIPPIE_KAT8 <- HIPPIE_KAT8[-c(1)]
+PINOT_KAT8 <- read.csv("~/PhD_Bioinformatics /Scoring /PINOTS/PINOTKAT8_S.csv")
+PINOT_KAT8 <- PINOT_KAT8[-c(1)]
+MIST_KAT8 <- read.csv("~/PhD_Bioinformatics /Scoring /MISTS/MISTKAT8_S.csv")
+MIST_KAT8 <- MIST_KAT8[-c(1)]
+
+
+KAT8_Score <- merge(KAT8_Ref, HIPPIE_KAT8, by.x="Interactor", by.y="Interactor_EntrezID", all.x=TRUE)
+KAT8_Score <- merge(KAT8_Score, PINOT_KAT8, by.x="Interactor", by.y="Interactor_EntrezID", all.x=TRUE)
+KAT8_Score <- merge(KAT8_Score, MIST_KAT8, by.x="Interactor", by.y="Interactor_EntrezID", all.x=TRUE)
+
+readr::write_csv(KAT8_Score, file =("~/PhD_Bioinformatics /Scoring /Raw_Score_Merge/KAT8_Score_Merge.csv")) # save results as CSV
+#KANSL1
+
+KANSL1_Ref <- read.csv("~/PhD_Bioinformatics /Scoring /KANSL1_ref_S.csv") 
+HIPPIE_KANSL1 <- read.csv("~/PhD_Bioinformatics /Scoring /HIPPIES/HIPPIEKANSL1_S.csv")
+HIPPIE_KANSL1 <- HIPPIE_KANSL1[-c(1)]
+PINOT_KANSL1 <- read.csv("~/PhD_Bioinformatics /Scoring /PINOTS/PINOTKANSL1_S.csv")
+PINOT_KANSL1 <- PINOT_KANSL1[-c(1)]
+MIST_KANSL1 <- read.csv("~/PhD_Bioinformatics /Scoring /MISTS/MISTKANSL1_S.csv")
+MIST_KANSL1 <- MIST_KANSL1[-c(1)]
+
+
+KANSL1_Score <- merge(KANSL1_Ref, HIPPIE_KANSL1, by.x="Interactor", by.y="Interactor_EntrezID", all.x=TRUE)
+KANSL1_Score <- merge(KANSL1_Score, PINOT_KANSL1, by.x="Interactor", by.y="Interactor_EntrezID", all.x=TRUE)
+KANSL1_Score <- merge(KANSL1_Score, MIST_KANSL1, by.x="Interactor", by.y="Interactor_EntrezID", all.x=TRUE)
+
+readr::write_csv(KANSL1_Score, file =("~/PhD_Bioinformatics /Scoring /Raw_Score_Merge/KANSL1_Score_Merge.csv")) # save results as CSV
+
+#KANSL2
+
+KANSL2_Ref <- read.csv("~/PhD_Bioinformatics /Scoring /KANSL2_ref_S.csv") 
+HIPPIE_KANSL2 <- read.csv("~/PhD_Bioinformatics /Scoring /HIPPIES/HIPPIEKANSL2_S.csv")
+HIPPIE_KANSL2 <- HIPPIE_KANSL2[-c(1)]
+PINOT_KANSL2 <- read.csv("~/PhD_Bioinformatics /Scoring /PINOTS/PINOTKANSL2_S.csv")
+PINOT_KANSL2 <- PINOT_KANSL2[-c(1)]
+MIST_KANSL2 <- read.csv("~/PhD_Bioinformatics /Scoring /MISTS/MISTKANSL2_S.csv")
+MIST_KANSL2 <- MIST_KANSL2[-c(1)]
+
+
+KANSL2_Score <- merge(KANSL2_Ref, HIPPIE_KANSL2, by.x="Interactor", by.y="Interactor_EntrezID", all.x=TRUE)
+KANSL2_Score <- merge(KANSL2_Score, PINOT_KANSL2, by.x="Interactor", by.y="Interactor_EntrezID", all.x=TRUE)
+KANSL2_Score <- merge(KANSL2_Score, MIST_KANSL2, by.x="Interactor", by.y="Interactor_EntrezID", all.x=TRUE)
+
+readr::write_csv(KANSL2_Score, file =("~/PhD_Bioinformatics /Scoring /Raw_Score_Merge/KANSL2_Score_Merge.csv")) # save results as CSV
+
+#KANSL3
+
+KANSL3_Ref <- read.csv("~/PhD_Bioinformatics /Scoring /KANSL3_ref_S.csv") 
+HIPPIE_KANSL3 <- read.csv("~/PhD_Bioinformatics /Scoring /HIPPIES/HIPPIEKANSL3_S.csv")
+HIPPIE_KANSL3 <- HIPPIE_KANSL3[-c(1)]
+PINOT_KANSL3 <- read.csv("~/PhD_Bioinformatics /Scoring /PINOTS/PINOTKANSL3_S.csv")
+PINOT_KANSL3 <- PINOT_KANSL3[-c(1)]
+MIST_KANSL3 <- read.csv("~/PhD_Bioinformatics /Scoring /MISTS/MISTKANSL3_S.csv")
+MIST_KANSL3 <- MIST_KANSL3[-c(1)]
+
+
+KANSL3_Score <- merge(KANSL3_Ref, HIPPIE_KANSL3, by.x="Interactor", by.y="Interactor_EntrezID", all.x=TRUE)
+KANSL3_Score <- merge(KANSL3_Score, PINOT_KANSL3, by.x="Interactor", by.y="Interactor_EntrezID", all.x=TRUE)
+KANSL3_Score <- merge(KANSL3_Score, MIST_KANSL3, by.x="Interactor", by.y="Interactor_EntrezID", all.x=TRUE)
+
+readr::write_csv(KANSL3_Score, file =("~/PhD_Bioinformatics /Scoring /Raw_Score_Merge/KANSL3_Score_Merge.csv")) # save results as CSV
+
+#WDR5
+
+WDR5_Ref <- read.csv("~/PhD_Bioinformatics /Scoring /WDR5_ref_S.csv") 
+HIPPIE_WDR5 <- read.csv("~/PhD_Bioinformatics /Scoring /HIPPIES/HIPPIEWDR5_S.csv")
+HIPPIE_WDR5 <- HIPPIE_WDR5[-c(1)]
+PINOT_WDR5 <- read.csv("~/PhD_Bioinformatics /Scoring /PINOTS/PINOTWDR5_S.csv")
+PINOT_WDR5 <- PINOT_WDR5[-c(1)]
+MIST_WDR5 <- read.csv("~/PhD_Bioinformatics /Scoring /MISTS/MISTWDR5_S.csv")
+MIST_WDR5 <- MIST_WDR5[-c(1)]
+
+
+WDR5_Score <- merge(WDR5_Ref, HIPPIE_WDR5, by.x="Interactor", by.y="Interactor_EntrezID", all.x=TRUE)
+WDR5_Score <- merge(WDR5_Score, PINOT_WDR5, by.x="Interactor", by.y="Interactor_EntrezID", all.x=TRUE)
+WDR5_Score <- merge(WDR5_Score, MIST_WDR5, by.x="Interactor", by.y="Interactor_EntrezID", all.x=TRUE)
+
+readr::write_csv(WDR5_Score, file =("~/PhD_Bioinformatics /Scoring /Raw_Score_Merge/WDR5_Score_Merge.csv")) # save results as CSV
+
+#PHF20
+
+PHF20_Ref <- read.csv("~/PhD_Bioinformatics /Scoring /PHF20_ref_S.csv") 
+HIPPIE_PHF20 <- read.csv("~/PhD_Bioinformatics /Scoring /HIPPIES/HIPPIEPHF20_S.csv")
+HIPPIE_PHF20 <- HIPPIE_PHF20[-c(1)]
+PINOT_PHF20 <- read.csv("~/PhD_Bioinformatics /Scoring /PINOTS/PINOTPHF20_S.csv")
+PINOT_PHF20 <- PINOT_PHF20[-c(1)]
+MIST_PHF20 <- read.csv("~/PhD_Bioinformatics /Scoring /MISTS/MISTPHF20_S.csv")
+MIST_PHF20 <- MIST_PHF20[-c(1)]
+
+
+PHF20_Score <- merge(PHF20_Ref, HIPPIE_PHF20, by.x="Interactor", by.y="Interactor_EntrezID", all.x=TRUE)
+PHF20_Score <- merge(PHF20_Score, PINOT_PHF20, by.x="Interactor", by.y="Interactor_EntrezID", all.x=TRUE)
+PHF20_Score <- merge(PHF20_Score, MIST_PHF20, by.x="Interactor", by.y="Interactor_EntrezID", all.x=TRUE)
+
+readr::write_csv(PHF20_Score, file =("~/PhD_Bioinformatics /Scoring /Raw_Score_Merge/PHF20_Score_Merge.csv")) # save results as CSV
+
+#OGT
+
+OGT_Ref <- read.csv("~/PhD_Bioinformatics /Scoring /OGT_ref_S.csv") 
+HIPPIE_OGT <- read.csv("~/PhD_Bioinformatics /Scoring /HIPPIES/HIPPIEOGT_S.csv")
+HIPPIE_OGT <- HIPPIE_OGT[-c(1)]
+PINOT_OGT <- read.csv("~/PhD_Bioinformatics /Scoring /PINOTS/PINOTOGT_S.csv")
+PINOT_OGT <- PINOT_OGT[-c(1)]
+MIST_OGT <- read.csv("~/PhD_Bioinformatics /Scoring /MISTS/MISTOGT_S.csv")
+MIST_OGT <- MIST_OGT[-c(1)]
+
+
+OGT_Score <- merge(OGT_Ref, HIPPIE_OGT, by.x="Interactor", by.y="Interactor_EntrezID", all.x=TRUE)
+OGT_Score <- merge(OGT_Score, PINOT_OGT, by.x="Interactor", by.y="Interactor_EntrezID", all.x=TRUE)
+OGT_Score <- merge(OGT_Score, MIST_OGT, by.x="Interactor", by.y="Interactor_EntrezID", all.x=TRUE)
+
+readr::write_csv(OGT_Score, file =("~/PhD_Bioinformatics /Scoring /Raw_Score_Merge/OGT_Score_Merge.csv")) # save results as CSV
+
+
+#MCRS1
+
+MCRS1_Ref <- read.csv("~/PhD_Bioinformatics /Scoring /MCRS1_ref_S.csv") 
+HIPPIE_MCRS1 <- read.csv("~/PhD_Bioinformatics /Scoring /HIPPIES/HIPPIEMCRS1_S.csv")
+HIPPIE_MCRS1 <- HIPPIE_MCRS1[-c(1)]
+PINOT_MCRS1 <- read.csv("~/PhD_Bioinformatics /Scoring /PINOTS/PINOTMCRS1_S.csv")
+PINOT_MCRS1 <- PINOT_MCRS1[-c(1)]
+MIST_MCRS1 <- read.csv("~/PhD_Bioinformatics /Scoring /MISTS/MISTMCRS1_S.csv")
+MIST_MCRS1 <- MIST_MCRS1[-c(1)]
+
+
+MCRS1_Score <- merge(MCRS1_Ref, HIPPIE_MCRS1, by.x="Interactor", by.y="Interactor_EntrezID", all.x=TRUE)
+MCRS1_Score <- merge(MCRS1_Score, PINOT_MCRS1, by.x="Interactor", by.y="Interactor_EntrezID", all.x=TRUE)
+MCRS1_Score <- merge(MCRS1_Score, MIST_MCRS1, by.x="Interactor", by.y="Interactor_EntrezID", all.x=TRUE)
+
+readr::write_csv(MCRS1_Score, file =("~/PhD_Bioinformatics /Scoring /Raw_Score_Merge/MCRS1_Score_Merge.csv")) # save results as CSV
+
+  
+
