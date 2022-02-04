@@ -33,9 +33,9 @@ readr::write_csv(mito_matrix_terms, file =("~/PhD_Bioinformatics /Supplementary 
 mito_matrix_terms <- read.csv("~/PhD_Bioinformatics /Supplementary /1.5/ mitochondrial_matrix_list.csv") #calls in list of 474 MM proteins. With column 'Y' identifer.
 mito_matrix_terms <- mito_matrix_terms[,c(2,4)]                                       #retains 'entrez' and 'MM' identifier column (containing 'Y')
 
-#Next line of code can be substituted for Second_layer list.
+#Next line of code can be substituted for Second_layer list : SL_interactors_unique
 
-First_layer <- read.csv("~/PhD_Bioinformatics /Supplementary /1.5/518FL_interactors.csv")        #calls in list of unique FL interactors (entrez ID)
+First_layer <- read.csv("~/PhD_Bioinformatics /Supplementary /1.5/FL_interactors_unique.csv")        #calls in list of unique FL interactors (entrez ID)
 
 
 
@@ -45,6 +45,8 @@ merge_mito_matrix <- merge(merge_mito_matrix, conversion_table, by.x="Interactor
 
 readr::write_csv(merge_mito_matrix, file =("~/PhD_Bioinformatics /Supplementary /1.5/First_layer_MM_overlap.csv")).   #Saves overlap as .csv file
 
+
+#SL MM overlap file saved : ("~/PhD_Bioinformatics /Supplementary /1.5/Second_layer_MM_overlap.csv")
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #Calls in the mitochondrial membrane terms (AmiGO2) and converts the to conventional HGNC gene name--------------------------------------------------
@@ -68,9 +70,9 @@ readr::write_csv(mito_membrane_terms, file =("~/PhD_Bioinformatics /Supplementar
 mito_membrane_terms <- read.csv("~/PhD_Bioinformatics /Supplementary /1.5/ mitochondrial_membrane_list.csv") #calls in list of  733 MEM proteins. With column 'Y' identifer.
 mito_membrane_terms <- mito_membrane_terms[,c(2,4)]                                       #retains 'entrez' and 'MEM' identifier column (containing 'Y')
 
-#Next line of code can be substituted for Second_layer list.
+#Next line of code can be substituted for Second_layer list: SL_interactors_unique.csv.
 
-First_layer <- read.csv("~/PhD_Bioinformatics /Supplementary /1.5/518FL_interactors.csv")        #calls in list of unique FL interactors (entrez ID)
+First_layer <- read.csv("~/PhD_Bioinformatics /Supplementary /1.5/FL_interactors_unique.csv")        #calls in list of unique FL interactors (entrez ID)
 
 
 
@@ -80,10 +82,15 @@ merge_mito_membrane <- merge(merge_mito_membrane, conversion_table, by.x="Intera
 
 readr::write_csv(merge_mito_membrane, file =("~/PhD_Bioinformatics /Supplementary /1.5/First_layer_MEM_overlap.csv")).   #Saves overlap as .csv file
 
+#SL MEM overlap file saved : ("~/PhD_Bioinformatics /Supplementary /1.5/Second_layer_MEM_overlap.csv"))
+
+
 ##Merging with the MitoCarta3.0 List---------------------------------------------------------------------------------------------------------------------------
 MitoCarta_terms <- read.csv("~/PhD_Bioinformatics /Supplementary /1.5/ MitoCarta3.0_List.csv")
 
-First_layer <- read.csv("~/PhD_Bioinformatics /Supplementary /1.5/518FL_interactors.csv")        #calls in list of unique FL interactors (entrez ID)
+#Next line of code can be substituted for Second_layer list: SL_interactors_unique.csv.
+
+First_layer <- read.csv("~/PhD_Bioinformatics /Supplementary /1.5/FL_interactors_unique.csv")        #calls in list of unique FL interactors (entrez ID)
 
 merge_mitocarta <- merge(First_layer, MitoCarta_terms, by.x="Interactor", by.y="HumanGeneID", all.x=TRUE)
 merge_mitocarta <- subset(merge_mitocarta, MitoCarta == "Y")                 #subsets dataframe, resulting dataframe contains ONLY overlapping entities.
@@ -92,6 +99,7 @@ merge_mitocarta <- merge(merge_mitocarta, conversion_table, by.x="Interactor", b
 
 readr::write_csv(merge_mitocarta, file =("~/PhD_Bioinformatics /Supplementary /1.5/ First_layer_mitoCarta_overlap.csv"))
 
+#SL MitoCarta overlap file saved :("~/PhD_Bioinformatics /Supplementary /1.5/ Second_layer_mitoCarta_overlap.csv")
 
 
 
