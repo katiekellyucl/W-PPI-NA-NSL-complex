@@ -1,0 +1,101 @@
+Author: Katie Kelly 
+Date : 03.02.22
+
+#Upload the libraries-------------------------------------------------------------------------------------------------------------------------------
+library(dplyr)
+library(tidyverse)
+library(ggplot2)
+
+#Imports the Dictionary, for conversion to conventional HGNC gene name--------------------------------------------------------------------------------
+
+conversion_table <- read.csv("~/PhD_Bioinformatics /Supplementary/ 1.5/ conversion_table.csv")
+conversion_table <- conversion_table[,c(1,2,3)]                                                   #retains the columns 'entrez', 'SwissID' and 'gene.name'.
+
+##AmiGO2 file processing steps------------------------------------------------------------------------------------------------------------------------
+#Calls in the mitochondrial matrix terms (AmiGO2) and converts the to conventional HGNC gene name--------------------------------------------------
+
+mito_matrix_terms <- read.csv("~/PhD_Bioinformatics /Supplementary /1.5/AmiGO_0005759_result.csv")
+
+mito_matrix_terms <- unique(mito_matrix_terms$UniprotID) #Subsets the list to retain only unique entries.
+mito_matrix_terms <- as.data.frame(mito_matrix_terms) #Converts the List > dataframe.
+mito_matrix_terms <- merge(mito_matrix_terms, conversion_table, by.x="mito_matrix_terms", by.y="swissID", all.x=TRUE) #Merges with the conversion table, to assign HGNC gene name.
+
+readr::write_csv(mito_matrix_terms, file =("~/PhD_Bioinformatics /Supplementary /1.5/ mitochondrial_matrix_EntrezID.csv")) # save results as CSV
+
+##Move into Excel to manually rectify 'NA' entries. Add column entitles 'MM' with 'Y' identifer for mitochondrial matrix proteins, upon merge with FL/SL interactor lists.
+          ## File saved in filepath: ~/PhD_Bioinformatics /Supplementary /1.5/ mitochondrial_matrix_list.csv
+
+
+#Next code block performs merge with the interactor list, to assess number of overlaps with the mitochondrial protein list. Subsets the list and assigns the HGNC gene name. Final dataframe contains overlapping entities.
+ 
+#Calls in the final mitochondrial matrix protein list. 
+
+mito_matrix_terms <- read.csv("~/PhD_Bioinformatics /Supplementary /1.5/ mitochondrial_matrix_list.csv") #calls in list of 474 MM proteins. With column 'Y' identifer.
+mito_matrix_terms <- mito_matrix_terms[,c(2,4)]                                       #retains 'entrez' and 'MM' identifier column (containing 'Y')
+
+#Next line of code can be substituted for Second_layer list.
+
+First_layer <- read.csv("~/PhD_Bioinformatics /Supplementary /1.5/518FL_interactors.csv")        #calls in list of unique FL interactors (entrez ID)
+
+
+
+merge_mito_matrix <- merge(First_layer, mito_matrix_terms, by.x="Interactor", by.y="entrez", all.x=TRUE)      #performs merge
+merge_mito_matrix <- subset(merge_mito_matrix, MM == "Y")                 #subsets dataframe, resulting dataframe contains ONLY overlapping entities.
+merge_mito_matrix <- merge(merge_mito_matrix, conversion_table, by.x="Interactor", by.y="entrez", all.x=TRUE).    #Assignment of HGNC gene name to overlapping entities.
+
+readr::write_csv(merge_mito_matrix, file =("~/PhD_Bioinformatics /Supplementary /1.5/First_layer_MM_overlap.csv")).   #Saves overlap as .csv file
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#Calls in the mitochondrial membrane terms (AmiGO2) and converts the to conventional HGNC gene name--------------------------------------------------
+
+mito_membrane_terms <- read.csv("~/PhD_Bioinformatics /Supplementary /1.5/AmiGO_0031966_result.csv")
+
+mito_membrane_terms <- uniquemito_membrane_terms$UniprotID) #Subsets the list to retain only unique entries.
+mito_membrane_terms <- as.data.frame(mito_membrane_terms) #Converts the List > dataframe.
+mito_membrane_terms <- merge(mito_membrane_terms, conversion_table, by.x="mito_membrane_terms", by.y="swissID", all.x=TRUE) #Merges with the conversion table, to assign HGNC gene name.
+
+readr::write_csv(mito_membrane_terms, file =("~/PhD_Bioinformatics /Supplementary /1.5/ mitochondrial_membrane_EntrezID.csv")) # save results as CSV
+
+##Move into Excel to manually rectify 'NA' entries. Add column entitles 'MEM' with 'Y' identifer for mitochondrial membrane proteins, upon merge with FL/SL interactor lists.
+          ## File saved in filepath: ~/PhD_Bioinformatics /Supplementary /1.5/ mitochondrial_membrane_list.csv
+
+
+#Next code block performs merge with the interactor list, to assess number of overlaps with the mitochondrial protein list. Subsets the list and assigns the HGNC gene name. Final dataframe contains overlapping entities.
+ 
+#Calls in the final mitochondrial membrane protein list. 
+
+mito_membrane_terms <- read.csv("~/PhD_Bioinformatics /Supplementary /1.5/ mitochondrial_membrane_list.csv") #calls in list of  733 MEM proteins. With column 'Y' identifer.
+mito_membrane_terms <- mito_membrane_terms[,c(2,4)]                                       #retains 'entrez' and 'MEM' identifier column (containing 'Y')
+
+#Next line of code can be substituted for Second_layer list.
+
+First_layer <- read.csv("~/PhD_Bioinformatics /Supplementary /1.5/518FL_interactors.csv")        #calls in list of unique FL interactors (entrez ID)
+
+
+
+merge_mito_membrane <- merge(First_layer, mito_membrane_terms, by.x="Interactor", by.y="entrez", all.x=TRUE)      #performs merge
+merge_mito_membrane <- subset(merge_mito_membrane, MEM == "Y")                 #subsets dataframe, resulting dataframe contains ONLY overlapping entities.
+merge_mito_membrane <- merge(merge_mito_membrane, conversion_table, by.x="Interactor", by.y="entrez", all.x=TRUE).    #Assignment of HGNC gene name to overlapping entities.
+
+readr::write_csv(merge_mito_membrane, file =("~/PhD_Bioinformatics /Supplementary /1.5/First_layer_MEM_overlap.csv")).   #Saves overlap as .csv file
+
+##Merging with the MitoCarta3.0 List---------------------------------------------------------------------------------------------------------------------------
+MitoCarta_terms <- read.csv("~/PhD_Bioinformatics /Supplementary /1.5/ MitoCarta3.0_List.csv")
+
+First_layer <- read.csv("~/PhD_Bioinformatics /Supplementary /1.5/518FL_interactors.csv")        #calls in list of unique FL interactors (entrez ID)
+
+merge_mitocarta <- merge(First_layer, MitoCarta_terms, by.x="Interactor", by.y="HumanGeneID", all.x=TRUE)
+merge_mitocarta <- subset(merge_mitocarta, MitoCarta == "Y")                 #subsets dataframe, resulting dataframe contains ONLY overlapping entities.
+merge_mitocarta <- merge(merge_mitocarta, conversion_table, by.x="Interactor", by.y="entrez", all.x=TRUE)    #Assignment of HGNC gene name to overlapping entities.
+
+
+readr::write_csv(merge_mitocarta, file =("~/PhD_Bioinformatics /Supplementary /1.5/ First_layer_mitoCarta_overlap.csv"))
+
+
+
+
+
+
+
+
