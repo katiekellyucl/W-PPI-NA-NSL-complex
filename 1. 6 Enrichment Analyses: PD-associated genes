@@ -92,5 +92,20 @@ NSL_PDgeneOverlap <- merge(NSL_PN, PD_GWAS_Pannelapp_unique, by.x="Interactor", 
 NSL_PDgeneOverlap <- subset(NSL_PDgeneOverlap, PD_gene == "Y") #Retains only rows with overlapping entities between the two lists.
 readr::write_csv(NSL_PDgeneOverlap, file =("~/PhD_Bioinformatics /Supplementary/1.6/NSL_PN_lenient_overlap.csv")) #Saves the overlapping entities as a .csv file. 
 
+#The following code assesses enrichment of the PD seeds within the complete NSL-PN. 
+
+PD_Seeds <- read.csv("~/PhD_Bioinformatics /Supplementary/1.6/PD_seeds.csv") #Calls in the PD seeds: dataframe contains columns "PD_seeds" (gene name) and "PD_seed" with "Y" string for identification upon merge. 
+
+conversion_table <- read.csv("~/PhD_Bioinformatics /conversion_table.csv")   #Calls ihn dictionary to obtain entrez ID for merge. 
+conversion_table <- conversion_table[,c(1,2,3)]
 
 
+PD_Seeds <- merge(PD_Seeds, conversion_table, by.x="PD_seeds", by.y="gene.name", all.x=TRUE)   #Merges with dictionary according to the gene name.
+PD_Seeds <- PD_Seeds[c(3,2)]   #Retains columns containing "entrez" and "PD_Seed" with "Y" identifier. 
+
+#Following line of code calls in the NSL-PN interactor list
+NSL_PN <- read.csv("~/PhD_Bioinformatics /Supplementary/1.6/NSL-PN_interactors_unique.csv") #calls in list of unique FL interactors (entrez ID)
+
+NSL_PN_stringent_overlap <- merge(NSL_PN, PD_Seeds, by.x="Interactor", by.y="entrez", all.x=TRUE)
+NSL_PN_stringent_overlap <- subset(NSL_PN_stringent_overlap, PD_Seed == "Y") #Retains only rows with overlapping entities between the two list
+readr::write_csv(NSL_PN_stringent_overlap, file =("~/PhD_Bioinformatics /Supplementary/1.6/NSL_PN_stringent_overlap.csv")) #Saves the overlapping entities as .csv file
