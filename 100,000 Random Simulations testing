@@ -1,0 +1,41 @@
+Author: Katie Kelly
+Date: 04.02.2022
+
+#The following lines of code, for the 100,000 simulations test have been sourced from _______ and adapted according to the statistical tests conducted during this analysis. 
+
+
+setwd("~/PhD_Bioinformatics")
+
+dictionary <- read.csv("~/PhD_Bioinformatics /Supplementary/ conversion_table.csv")     #Uploads the dictionary from which the random selections will be made
+dictionary <- dictionary[c(1)]                                                     #Subsets the dictionary to only retain the entrez ID.
+
+
+I <- read.csv("~/PhD_Bioinformatics /Supplementary/ PD_GWAS_Pannelapp_unique_mod.csv")#this is the list you compare your random list of genes to.
+
+dictionary <- dictionary  #this is the list you randomise. 
+
+
+i <- 1
+R <- integer()
+
+for (i in 1:100000) {
+  random <- sample(1:19947, 517, replace=FALSE)               #19947 is total number of genes in the dictionary. 517 is the total number of genes in the FL NSL interactome.Here this number can be exchanged for the total number of interactors in the SL interactome. 
+  ran <- (dictionary[random,])
+  v <- merge (ran, I, by.x= 1, by.y= "entrez", all.x=FALSE)
+  R[i] <- nrow(v)
+  i <- i+1
+}
+
+#R will now contain the results from 100000 simulations
+
+r <- sort (R, decreasing=FALSE)                         #sorts from lowest number of matches to the highest number of matches. 
+a <- table (R)                                          #table will calculate how many 0,1,2,3 etc. How many times the number of random matches has been each of these different values.
+write.table (a, "100000randomNDu.txt", quote=FALSE, row.names=FALSE).    #Saves the table that can be uploaded into Excel, in order to generate the normal distribution curve. 
+
+
+mean(r)        #returns the mean number of matches between tne 2 lists
+sd(r)          #returns the standard deviation of the number of matches between tne 2 lists  
+real <- 13     # Here manually insert the number of ACTUAL matches observed between the two lists, in order for the statistical test to be carried out, and p value to be generated
+pnorm(real, mean(r), sd(r), lower.tail=FALSE)                         #Generates the summary statistics. Lower tail is false, because we cannot have a lower tail (below 0.)
+
+##The normal distribution curve can be generated in Excel for visualisation of the 100,000 simulations, and to see statistical signficance of the number of matches observed.
