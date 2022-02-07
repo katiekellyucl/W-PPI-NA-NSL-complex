@@ -1,0 +1,70 @@
+
+Author: Katie Kelly 
+Date : 07.02.22
+
+
+#1515 Genes associated with Neurodegeneration, dowloaded from DisGenNET (07.02.22)
+#Downloaded as .TSV file, imported into Excel > saved as .csv file 
+#Columns retained: "Gene", "Gene_id", "Score_gda". 
+#Column added: "ND" with "Y" for identifier/subset upon merge with the interactor list in rStudio.
+
+#The following script imports the list of genes associated with neurodegeneration, retains columns: "Gene_id", "Score_gda", "ND".
+
+ND_genes <- read.csv("~/PhD_Bioinformatics /neurodegeneration_genes.csv")
+ND_genes<- ND_genes[c(2,3,4)]    #Retains relevant columns 
+
+#The following script imports the members of the complete NSL-PN.
+
+NSL_PN <- read.csv("~/PhD_Bioinformatics /Supplementary/1.6/NSL-PN_interactors_unique.csv")
+NSL_PN <- NSL_PN[c(1)].     #Retains only the column containing 'Interactor' (entrez ID)
+
+
+
+
+#The following script subsets the ND-associated gene list, according to the "Score_gda".
+                #Subsets ND genes with Score_gda > 0.01.
+
+ND_genes_threshold0.01 <- subset(ND_genes, Score_gda > 0.01)
+readr::write_csv(ND_genes_threshold0.01, "~/PhD_Bioinformatics /Supplementary/1.6/ND_genes>0.01.csv") #Saves file as .csv
+
+#The following script subsets the ND-associated gene list, according to the "Score_gda".
+                
+                #Subsets ND genes with Score_gda > 0.05
+
+ND_genes_threshold0.05 <- subset(ND_genes, Score_gda > 0.05)
+readr::write_csv(ND_genes_threshold0.05, "~/PhD_Bioinformatics /Supplementary/1.6/ND_genes>0.05.csv")
+
+                #Subsets ND genes with Score_gda > 0.1
+                
+ND_genes_threshold0.1 <- subset(ND_genes, Score_gda > 0.1)
+readr::write_csv(ND_genes_threshold0.1, "~/PhD_Bioinformatics /Supplementary/1.6/ND_genes>0.1.csv")
+
+
+
+ #Enrichment analysis: Stability testing 
+
+#The following script completes the merge: NSL-PN, with the complete list of ND-associated genes. 
+
+NSL_ND_Overlap <- merge(NSL_PN , ND_genes, by.x="Interactor", by.y="Gene_id", all.x=TRUE)
+NSL_ND_Overlap <- subset(NSL_ND_Overlap, ND == "Y")  #Subsets the result, to return in a dataframe only those rows with "Y" within the "ND" column (overlapping genes).
+
+
+#The following script completes the merge: NSL-PN, with ND-associated genes (Score_gda > 0.05).
+
+NSL_ND_Overlap_0.05 <- merge(NSL_PN , ND_genes_threshold0.05, by.x="Interactor", by.y="Gene_id", all.x=TRUE)
+NSL_ND_Overlap_threshold2 <- subset(NSL_ND_Overlap_0.05, ND == "Y")  
+
+
+#The following script completes the merge: NSL-PN, with ND-associated genes (Score_gda > 0.1).
+
+NSL_ND_Overlap_0.1 <- merge(NSL_PN , ND_genes_threshold0.1, by.x="Interactor", by.y="Gene_id", all.x=TRUE)
+NSL_ND_Overlap_threshold3 <- subset(NSL_ND_Overlap_0.1, ND == "Y")  
+
+readr::write_csv(ND_genes_threshold0.1, "~/PhD_Bioinformatics /Supplementary/1.6/NSL_ND_genes_overlap>0.1.csv")# saves file as .csv
+
+
+#Statistical testing for signficance, using 100000 random simulations test - script in alternative file within this project folder. 
+
+
+
+
