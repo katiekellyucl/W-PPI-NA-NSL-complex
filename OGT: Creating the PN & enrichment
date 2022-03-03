@@ -1,0 +1,134 @@
+Author: Katie Kelly 
+Date : 02.03.22
+
+
+#Upload Libraries--------------------------------------------------------------------------------------------------------------------------------------------
+
+library(dplyr)
+library(tidyverse)
+library(ggplot2)
+library(data.table)
+library(tidyr)
+
+
+#The following code calls in the OGT FL interactors, that meet the confidence threshold (obtained from PINOT, MIST and HIPPIE). Generates a list of UniProt ID for input into PINOT to derive the SL.
+
+OGT_FL <- read.csv("~/PhD_Bioinformatics /Supplementary/1.3/Threshhold_retained /OGT_Score_retained.csv")
+OGT_FL <- merge(OGT_FL, Conversion_table, by.x="Interactor", by.y="entrez", all.x=TRUE)
+
+OGT_FL <- OGT_FL[c(1,2,7,8)]
+readr::write_csv(OGT_FL, "~/PhD_Bioinformatics /OGT/OGT_FL.csv") #Saves the dataframe with the UniProt ID.
+
+#The following lines code process the SL search results 
+
+#Call in the inital search result
+
+raw_data <- read.csv("~/PhD_Bioinformatics /OGT/SL/Raw_data.csv") #calls in the raw data (.csv file)
+raw_data <- raw_data[c(1,3,4,6,11)] 
+colnames(raw_data) <-c("Seed","EntrezID", "Interactor","EntrezID", "Final_Score")
+OGT_SL_threshold <- subset(raw_data, Final_Score > 2) #Filters for those interactions with a PINOT assigned confidence score of '>2') #there are 583
+readr::write_csv(OGT_SL_threshold, file =("~/PhD_Bioinformatics /OGT/SL/OGT_SL_threshhold.csv")) # save results as CSV
+
+##Performning the enrichment analyses and preparing a dataframe for cytoscape.
+#The next lines of code are necessary for the formation of the network within cytoscape: Ensure that there are no duplicate interactions (OGT within the interactor and seed column)
+
+OGT_PN <- read.csv("~/PhD_Bioinformatics /OGT/SL/OGT_PN.csv") #calls in the raw data (.csv file)
+OGT_PN_cytoscape <- subset(OGT_PN, Interactor != "OGT") #Removes all rows that contains 'OGT' as an interactor. 
+readr::write_csv(OGT_PN_cytoscape, file =("~/PhD_Bioinformatics /OGT/SL/OGT_PN_cytoscape.csv")) # save results as CSV
+
+
+#merging with the conversion table, to obtain the entrez ID. For onward merge with OD/Mitochondrial protein lists.
+OGT_PN_cytoscape <- merge(OGT_PN_cytoscape, Conversion_table, by.x="Interactor", by.y="gene.name", all.x=TRUE)
+OGT_PN_cytoscape <- OGT_PN_cytoscape[c(1,2,3,4)] 
+
+##PD: enrichment 
+PD_GWAS_Pannelapp_unique <- read.csv("~/PhD_Bioinformatics /Supplementary/1.6/PD_GWAS_Pannelapp_unique_mod.csv") #calls in the processed PD-associated gene list.
+
+
+#Following lines of code perform merge of the unique PD-associated gene lists with complete OGT interactome.
+OGT_PN_cytoscape <- merge(OGT_PN_cytoscape, PD_GWAS_Pannelapp_unique, by.x="entrez", by.y="entrez", all.x=TRUE)
+OGT_PN_PD <- subset(OGT_PN_cytoscape, PD_gene == "Y") #Retains only rows with overlapping entities between the two lists.
+OGT_PN_PD <- OGT_PN_PD[c(1,2,5)]
+OGT_PN_PD <- unique(OGT_PN_PD) #Obtains the unique list of interactors which are found to overlap with the PD list.
+
+readr::write_csv(OGT_PN_PD, file =("~/PhD_Bioinformatics /OGT/Enrichment /OGT_PD.csv")) #Saves the overlapping entities as a .csv file. 
+
+#Following lines of code perform merge of the stringent PD genes with complete OGT interactome.
+PD_Seeds <- read.csv("~/PhD_Bioinformatics /Supplementary/1.6/PD_seeds.csv") #Calls in the PD seeds: dataframe contains columns "PD_seeds" (gene name) and "PD_seed" with "Y" string for identification upon merge. 
+
+conversion_table <- read.csv("~/PhD_Bioinformatics /conversion_table.csv").   #Calls ihn dictionary to obtain entrez ID for merge. 
+conversion_table <- conversion_table[,c(1,2,3)]
+
+PD_Seeds <- merge(PD_Seeds, Conversion_table, by.x="PD_seeds", by.y="gene.name", all.x=TRUE).   #Merges with dictionary according to the gene name.
+PD_Seeds <- PD_Seeds[c(3,2)]   #Retains columns containing "entrez" and "PD_Seed" with "Y" identifier. 
+
+
+#Overlap
+OGT_PN_cytoscape <- merge(OGT_PN_cytoscape, PD_Seeds, by.x="entrez", by.y="entrez", all.x=TRUE)
+OGT_PN_PDstringent<- subset(OGT_PN_cytoscape, PD_Seed == "Y") #Retains only rows with overlapping entities between the two lists. 
+OGT_PN_PDstringent <- OGT_PN_PDstringent[c(1,2,7)]
+OGT_PN_PDstringent <- unique(OGT_PN_PDstringent) #Obtains the unique list of interactors which are found to overlap with the PD list.
+
+readr::write_csv(OGT_PN_PDstringent, file =("~/PhD_Bioinformatics /OGT/Enrichment /OGT_PD_stringent.csv")) #Saves the overlapping entities as .csv file
+
+##mitochondrial enrichment 
+#Calls in the AmiGO mitochondrial matrix protein list.
+mito_matrix_terms <- read.csv("~/PhD_Bioinformatics /Supplementary/1.5/ mitochondrial_matrix_list.csv") #calls in list of 474 MM proteins. With column 'Y' identifer.
+mito_matrix_terms <- mito_matrix_terms[,c(2,4)]                                       #retains 'entrez' and 'MM' identifier column (containing 'Y')
+
+OGT_PN_cytoscape <- merge(OGT_PN_cytoscape, mito_matrix_terms, by.x="entrez", by.y="entrez", all.x=TRUE)      #performs merge
+OGT_PN_mitochondrialmatrix <- subset(OGT_PN_cytoscape, MM == "Y")                 #subsets dataframe, resulting dataframe contains ONLY overlapping entities.
+OGT_PN_mitochondrialmatrix <- OGT_PN_mitochondrialmatrix[c(1,2,8)]
+OGT_PN_mitochondrialmatrix <- unique(OGT_PN_mitochondrialmatrix) #Obtains the unique list of interactors which are found to overlap with the mitochondrial matrix list.
+
+readr::write_csv(OGT_PN_mitochondrialmatrix, file =("~/PhD_Bioinformatics /OGT/Enrichment /OGT_PN_mitochondrialmatrix.csv"))   #Saves overlap as .csv file
+
+#Calls in the AmiGO mitochondrial membrane protein list. 
+
+mito_membrane_terms <- read.csv("~/PhD_Bioinformatics /Supplementary/1.5/ mitochondrial_membrane_list.csv") #calls in list of  733 MEM proteins. With column 'Y' identifer.
+mito_membrane_terms <- mito_membrane_terms[,c(2,4)]                                       #retains 'entrez' and 'MEM' identifier column (containing 'Y')
+
+
+OGT_PN_cytoscape <- merge(OGT_PN_cytoscape, mito_membrane_terms, by.x="entrez", by.y="entrez", all.x=TRUE)      #performs merge
+OGT_PN_mitochondrialmembrane <- subset(OGT_PN_cytoscape, MEM == "Y")                 #subsets dataframe, resulting dataframe contains ONLY overlapping entities.
+OGT_PN_mitochondrialmembrane<- OGT_PN_mitochondrialmembrane[c(1,2,9)]
+OGT_PN_mitochondrialmembrane <- unique(OGT_PN_mitochondrialmembrane) #Obtains the unique list of interactors which are found to overlap with the mitochondrial membrane list.
+
+readr::write_csv(OGT_PN_mitochonrialmatrix, file =("~/PhD_Bioinformatics /OGT/Enrichment /OGT_PN_Mitochondrialmembrane.csv"))   #Saves overlap as .csv file
+
+#Calls in the MitoCarta3.0 List---------------------------------------------------------------------------------------------------------------------------
+MitoCarta_terms <- read.csv("~/PhD_Bioinformatics /Supplementary /1.5/ MitoCarta3.0_List.csv")
+
+
+OGT_PN_cytoscape <- merge(OGT_PN_cytoscape, MitoCarta_terms, by.x="entrez", by.y="HumanGeneID", all.x=TRUE)
+OGT_PN_mitocarta <- subset(OGT_PN_cytoscape , MitoCarta == "Y")                 #subsets dataframe, resulting dataframe contains ONLY overlapping entities.
+OGT_PN_mitocarta<- OGT_PN_mitocarta[c(1,2,10)]
+OGT_PN_mitocarta <- unique(OGT_PN_mitocarta) #Obtains the unique list of interactors which are found to overlap with the mitoCarta list.
+
+readr::write_csv(OGT_PN_mitocarta, file =("~/PhD_Bioinformatics /OGT/Enrichment /OGT_PN_MitoCarta.csv"))
+
+##ND: enrichment (retains the ND-association score)
+
+#The following script imports the list of genes associated with neurodegeneration, retains columns: "Gene_id", "Score_gda", "ND".
+
+ND_genes <- read.csv("~/PhD_Bioinformatics /ND_genes.csv")
+ND_genes<- ND_genes[c(2,3,4)]    #Retains relevant columns 
+
+OGT_PN_cytoscape <- merge(OGT_PN_cytoscape, ND_genes, by.x="entrez", by.y="Gene_id", all.x=TRUE)
+OGT_PN_ND <- subset(OGT_PN_cytoscape, ND == "Y")  #Subsets the result, to return in a dataframe only those rows with "Y" within the "ND" column (overlapping genes).
+OGT_PN_ND<- OGT_PN_ND[c(1,2,12,13)]
+OGT_PN_ND <- unique(OGT_PN_ND) #Obtains the unique list of interactors which are found to overlap with the ND gene list.
+
+
+readr::write_csv(OGT_PN_ND, file =("~/PhD_Bioinformatics /OGT/Enrichment /OGT_PN_ND.csv"))
+
+
+#The file file for cytoscape 
+OGT_PN_cytoscape <- OGT_PN_cytoscape [c(1,2,3,4,5,6,7,8,9,10,12,13)] 
+OGT_PN_cytoscape <- OGT_PN_cytoscape %>% replace(is.na(.), 0)
+
+readr::write_csv(OGT_PN_cytoscape, file =("~/PhD_Bioinformatics /OGT/cytoscape/OGT_PN_cytoscape.csv"))
+
+
+To create a column with a single integer to represent 'mitochondrial', in Excel: replaced all 'Y' string values in cells with '1'. Then created a 'sum' column using the sum function. Renamed this column 'mito'.
+
