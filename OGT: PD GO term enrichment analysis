@@ -1,0 +1,31 @@
+Author: Katie Kelly
+Date: 02.02.22
+
+
+#Upload libraries:------------------------------------------------------------------------------------------------------------------------------------
+
+library(dplyr)
+library(tidyverse)
+library(ggplot2)
+
+#Uploads the list of PD-related GO terms. 
+#doi: 10.1007/s12021-015-9293-2 (Lovering et al. have created the list, by annotating proteins to PD GO terms)
+
+
+PD_GO_terms <- read.csv("~/PhD_Bioinformatics /OGT/PD_GO_terms.csv") #4528 terms 
+PD_GO_terms <- PD_GO_terms[c(3)]
+PD_GO_terms <- unique(PD_GO_terms) # 1322 unique terms that are associated with PD. 
+
+#The following steps are taken to find the GO terms that are associated with the OGT interactors. 
+
+TRAK1_GO_terms <- read.csv("~/PhD_Bioinformatics /OGT/TRAK_GO_terms.csv") #39 terms
+TRAK1_GO_terms <- TRAK1_GO_terms[c(1)]
+TRAK1_GO_terms <- unique(TRAK1_GO_terms) #21 terms 
+TRAK1_GO_terms$PDGOTERM <- "Y" #Adds a new column with "y" as a string class
+
+TRAK1_Overlaps <- merge(PD_GO_terms, TRAK1_GO_terms, by.x="GO_term", by.y="GO_term", all.x=TRUE)
+TRAK1_Overlaps <- subset(TRAK1_Overlaps, PDGOTERM == "y") #filters to retain only the rows for which the GO term is represented within the PD- dataset and the TRAK1 dataset.
+
+#Note that there are 0 overlaps with the PD-associated GO terms. 
+
+
