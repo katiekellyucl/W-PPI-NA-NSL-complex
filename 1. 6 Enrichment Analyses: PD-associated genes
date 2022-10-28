@@ -1,111 +1,111 @@
 Author: Katie Kelly 
 Date: 04.02.2022
 
+#Upload libraries:------------------------------------------------------------------------------------------------------------------------------------
 
-#Calls in the dictionary
+library(dplyr)
+library(tidyverse)
+library(ggplot2)
 
-conversion_table <- read.csv("~/PhD_Bioinformatics /conversion_table.csv")
+#Import the 'Gene Dictionary'. The gene dictionary is a list of list of 19,947 genes (obtained by processing the file downloaded from HGNC: (https://www.genenames.org/download/statistics-and-files/) on August 2019 (Tomkins, Ferrari et al. 2020))  
+
+conversion_table <- read.csv("~filepath/filename.csv")
 conversion_table <- conversion_table[,c(1,2,3)]
 
 
-#Calling in the PD-associated gene lists (lenient)
+#Calling in the PD risk gene lists 
 #Calls in dataframe containing both Panelapp and GWAS PD genes, returns a dataframe containing only those entities that are unique between the lists. 
 
-#Note that "PD_GWAS_panelapp" file contains column 'PD_gene' containing "Y" string, as identifier for merge with the interactor lists. 
+#Note that the file assigned to the "PD_GWAS_panelapp" object, contains 2 columns: i) Entrez ID and ii)  'PD_gene' containing "Y" string, as identifier for merge with the interactor lists. 
 
-PD_GWAS_Pannelapp <- read.csv("~/PhD_Bioinformatics /Supplementary/1.6/PD_GWAS_panelapp.csv")
+PD_GWAS_Pannelapp <- read.csv("filepath/filename.csv") #calls in a single list of Panelapp and GWAS PD risk genes. 
 PD_GWAS_Pannelapp <- unique(PD_GWAS_Pannelapp)                                             #Returns the unique list of PD-associated genes from both lists 
 PD_GWAS_Pannelapp <- merge(PD_GWAS_Pannelapp, conversion_table, by.x="Gene_Symbol", by.y="gene.name", all.x=TRUE).    #Merges with the dictionary, to obtain gene names. 
 PD_GWAS_Pannelapp <- PD_GWAS_Pannelapp[c(3,2,1)] #Orders the columns: 'entrez', 'PD_gene', 'Gene.Symbol'.
 
-readr::write_csv(PD_GWAS_Pannelapp, file =("~/PhD_Bioinformatics /PD_enrichment/PD_GWAS_Pannelapp_unique.csv")) #Saves the file as .csv, ready for merge with interactor list.
+readr::write_csv(PD_GWAS_Pannelapp, file =("~filepath/filename.csv")) #Saves the file as .csv, ready for merge with interactor list.
 
-#Move into Excel for the manual annotation of Entrez ID (11 entities missing from the conversion table)
-#File saved in the following file path: "~/PhD_Bioinformatics /PD_enrichment/PD_GWAS_Pannelapp_unique_mod.csv"
+#Move into Excel for the manual annotation of Entrez ID (those not found within dictionary used).
+
 
 
 ##The following code overlaps with PD-associated protein list with the FL and SL interactors, to reveal overlapping entities for the assessment of enrichment. 
 
-PD_GWAS_Pannelapp_unique <- read.csv("~/PhD_Bioinformatics /Supplementary/1.6/PD_GWAS_Pannelapp_unique_mod.csv") #calls in the processed PD-associated gene list.
+PD_GWAS_Pannelapp_unique <- read.csv("~filepath/filename.csv") #calls in the processed PD-associated gene list from above.
 
 #Following lines of code call in the FL and SL unique interactor lists 
 
-First_layer <- read.csv("~/PhD_Bioinformatics /Supplementary /1.5/FL_interactors_unique.csv") #calls in list of unique FL interactors (entrez ID)
+First_layer <- read.csv("~filepath/filename.csv") #calls in list of unique FL interactors (a single column of protein entrez IDs)
 
-Second_layer <- read.csv("~/PhD_Bioinformatics /Supplementary /1.5/SL_interactors_unique.csv") #calls in list of unique FL interactors (entrez ID)
+Second_layer <- read.csv("~filepath/filename.csv") #calls in list of unique SL interactors (a single column of protein entrez IDs)
 
 
 #Following lines of code perform merge of the unique PD-associated gene lists with the FL and SL interactor lists. 
 First_layer_PDgeneOverlap <- merge(First_layer, PD_GWAS_Pannelapp_unique, by.x="Interactor", by.y="entrez", all.x=TRUE)
 First_layer_PDgeneOverlap <- subset(First_layer_PDgeneOverlap, PD_gene == "Y") #Retains only rows with overlapping entities between the two lists.
-readr::write_csv(First_layer_PDgeneOverlap, file =("~/PhD_Bioinformatics /Supplementary/1.6/FL_lenient_overlap.csv")) #Saves the overlapping entities as a .csv file. 
+readr::write_csv(First_layer_PDgeneOverlap, file =("~filepath/filename.csv")) #Saves the overlapping entities as a .csv file. 
 
 
 Second_layer_PDgeneOverlap <- merge(Second_layer, PD_GWAS_Pannelapp_unique, by.x="Interactor", by.y="entrez", all.x=TRUE)
 
-readr::write_csv(Second_layer_PDgeneOverlap, file =("~/PhD_Bioinformatics/Supplementary/1.6/ SL_lenient_overlap.csv"))
+readr::write_csv(Second_layer_PDgeneOverlap, file =("~filepath/filename.csv"))
 
-#Assesses enrichment with the stringent list of PD-associated genes (derived from W-PPI-NA).
+#Assesses enrichment with the  list of 15 Mendelian PD genes (derived from W-PPI-NA (see methods for details)).
 #Stringent PD genes
 
-PD_Seeds <- read.csv("~/PhD_Bioinformatics /Supplementary/1.6/PD_seeds.csv") #Calls in the PD seeds: dataframe contains columns "PD_seeds" (gene name) and "PD_seed" with "Y" string for identification upon merge. 
+PD_Seeds <- read.csv("~filepath/filename.csv") #Calls in the PD seeds (15 Mendelian PD genes): dataframe contains columns "PD_seeds" (gene name) and "PD_seed" with "Y" string for identification upon merge. 
 
-conversion_table <- read.csv("~/PhD_Bioinformatics /conversion_table.csv").   #Calls ihn dictionary to obtain entrez ID for merge. 
-conversion_table <- conversion_table[,c(1,2,3)]
-
+#following lines of code allow merge of the dictionary with the list of Mendelian PD genes, to obtain the Entrez ID for each of them.
 PD_Seeds <- merge(PD_Seeds, Conversion_table, by.x="PD_seeds", by.y="gene.name", all.x=TRUE).   #Merges with dictionary according to the gene name.
 PD_Seeds <- PD_Seeds[c(3,2)].   #Retains columns containing "entrez" and "PD_Seed" with "Y" identifier. 
 
 #Following lines of code call in the FL and SL unique interactor lists 
 
-First_layer <- read.csv("~/PhD_Bioinformatics /Supplementary/1.5/FL_interactors_unique.csv") #calls in list of unique FL interactors (entrez ID)
-Second_layer <- read.csv("~/PhD_Bioinformatics /Supplementary/1.5/SL_interactors_unique.csv") #calls in list of unique FL interactors (entrez ID)
+First_layer <- read.csv("~filepath/filename.csv") #calls in list of unique FL interactors (entrez ID)
+Second_layer <- read.csv("~filepath/filename.csv") #calls in list of unique FL interactors (entrez ID)
 
 #The following lines of code perform the overlap with the FL and SL interactor lists to assess enrichment.
 
 #First layer
 FL_PD_stringent_overlap <- merge(First_layer, PD_Seeds, by.x="Interactor", by.y="entrez", all.x=TRUE)
 FL_PD_stringent_overlap <- subset(FL_PD_stringent_overlap, PD_Seed == "Y") #Retains only rows with overlapping entities between the two list
-readr::write_csv(FL_PD_stringent_overlap, file =("~/PhD_Bioinformatics /Supplementary/1.6/FL_PD_stringent_overlap.csv")) #Saves the overlapping entities as .csv file
+readr::write_csv(FL_PD_stringent_overlap, file =("~filepath/filename.csv")) #Saves the overlapping entities as .csv file
 
 #Second layer
 
 SL_PD_stringent_overlap <- merge(Second_layer, PD_Seeds, by.x="Interactor", by.y="entrez", all.x=TRUE)
 SL_PD_stringent_overlap <- subset(SL_PD_stringent_overlap, PD_Seed == "Y") #Retains only rows with overlapping entities between the two list
-readr::write_csv(SL_PD_stringent_overlap, file =("~/PhD_Bioinformatics /Supplementary/1.6/SL_PD_stringent_overlap.csv")) #Saves the overlapping entities as .csv file
+readr::write_csv(SL_PD_stringent_overlap, file =("~filepath/filename.csv")) #Saves the overlapping entities as .csv file
 
-##In Excel, created dataframe that has SL interactome + FL +SL seeds (complete NSL-PN). Contains 2862 entities. 
-#Files saved in the following filepath: "~/PhD_Bioinformatics /Supplementary/1.6/NSL-PN_interactors_unique.csv"
+##In Excel, created dataframe that has SL interactome = FL +SL seeds (complete NSL-PN). 
+
 
 ##Can merge this complete NSL-PN with the PD-associated lists to find the enrichment within the entire network. 
 
-PD_GWAS_Pannelapp_unique <- read.csv("~/PhD_Bioinformatics /Supplementary/1.6/PD_GWAS_Pannelapp_unique_mod.csv") #calls in the processed PD-associated gene list.
+PD_GWAS_Pannelapp_unique <- read.csv("~filepath/filename.csv") #calls in the processed PD-associated gene list.
 
 
 #Following line of code calls in the NSL-PN interactor list
 
-NSL_PN <- read.csv("~/PhD_Bioinformatics /Supplementary/1.6/NSL-PN_interactors_unique.csv") #calls in list of unique FL interactors (entrez ID)
+NSL_PN <- read.csv("~filepath/filename.csv") #calls in FL +SL seeds (SL interactome) (entrez ID)
 
 #Following lines of code perform merge of the unique PD-associated gene lists with the NSLinteractor lists. 
 
 NSL_PDgeneOverlap <- merge(NSL_PN, PD_GWAS_Pannelapp_unique, by.x="Interactor", by.y="entrez", all.x=TRUE)
 NSL_PDgeneOverlap <- subset(NSL_PDgeneOverlap, PD_gene == "Y") #Retains only rows with overlapping entities between the two lists.
-readr::write_csv(NSL_PDgeneOverlap, file =("~/PhD_Bioinformatics /Supplementary/1.6/NSL_PN_lenient_overlap.csv")) #Saves the overlapping entities as a .csv file. 
+readr::write_csv(NSL_PDgeneOverlap, file =("~filepath/filename.csv")) #Saves the overlapping entities as a .csv file. 
 
 #The following code assesses enrichment of the PD seeds within the complete NSL-PN. 
 
-PD_Seeds <- read.csv("~/PhD_Bioinformatics /Supplementary/1.6/PD_seeds.csv") #Calls in the PD seeds: dataframe contains columns "PD_seeds" (gene name) and "PD_seed" with "Y" string for identification upon merge. 
+PD_Seeds <- read.csv("~filepath/filename.csv") #Calls in the PD seeds: dataframe contains columns "PD_seeds" (gene name) and "PD_seed" with "Y" string for identification upon merge. 
 
-conversion_table <- read.csv("~/PhD_Bioinformatics /conversion_table.csv")   #Calls ihn dictionary to obtain entrez ID for merge. 
-conversion_table <- conversion_table[,c(1,2,3)]
-
-
+#The following lines of code merge the dictionary with the list of Mendelian PD gene list to obtain the Entrez ID.
 PD_Seeds <- merge(PD_Seeds, conversion_table, by.x="PD_seeds", by.y="gene.name", all.x=TRUE)   #Merges with dictionary according to the gene name.
 PD_Seeds <- PD_Seeds[c(3,2)]   #Retains columns containing "entrez" and "PD_Seed" with "Y" identifier. 
 
 #Following line of code calls in the NSL-PN interactor list
-NSL_PN <- read.csv("~/PhD_Bioinformatics /Supplementary/1.6/NSL-PN_interactors_unique.csv") #calls in list of unique FL interactors (entrez ID)
+NSL_PN <- read.csv("~filepath/filename.csv") #calls in list of unique FL interactors (entrez ID)
 
 NSL_PN_stringent_overlap <- merge(NSL_PN, PD_Seeds, by.x="Interactor", by.y="entrez", all.x=TRUE)
 NSL_PN_stringent_overlap <- subset(NSL_PN_stringent_overlap, PD_Seed == "Y") #Retains only rows with overlapping entities between the two list
-readr::write_csv(NSL_PN_stringent_overlap, file =("~/PhD_Bioinformatics /Supplementary/1.6/NSL_PN_stringent_overlap.csv")) #Saves the overlapping entities as .csv file
+readr::write_csv(NSL_PN_stringent_overlap, file =("~filepath/filename.csv")) #Saves the overlapping entities as .csv file
