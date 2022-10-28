@@ -12,13 +12,13 @@ library(tidyverse)
 
 #First: Generate refined PD_CORE network.
 
-PD_SL_PINOT_result <- read.csv("~/PhD_Bioinformatics /Supplementary/1.7/Second_layer_PINOT_result.csv") #calls in the SL result from PINOT
+PD_SL_PINOT_result <- read.csv("~filepath/filename.csv") #calls in the SL result from PINOT.
 
 PD_SL_PINOT_result<- PD_SL_PINOT_result[c(1,4,5,6,11)] #retains relevant columns 
 
 colnames(PD_SL_PINOT_result) <- c("Seed", "Interactor","SwissID", "EntrezID","Final_score")    #renames columns 
 
-PD_SL_PINOT_threshold <- filter(PD_SL_PINOT_result, Final_score > 2) %>% write_csv("~/PhD_Bioinformatics /Supplementary/1.7/Second_layer_PD_linked_threshold.csv")#applies the score threshold of 2, saves file as .csv
+PD_SL_PINOT_threshold <- filter(PD_SL_PINOT_result, Final_score > 2) %>% write_csv("~filepath/filename.csv")#applies the score threshold of 2, saves file as .csv
 
 
 
@@ -26,56 +26,56 @@ PD_SL_PINOT_threshold <- filter(PD_SL_PINOT_result, Final_score > 2) %>% write_c
 
 ATN1 <- filter(PD_SL_PINOT_threshold, Seed == "ATN1") 
 ATN1$ATN1 <- 1
-ATN1 <- ATN1[c(4,6)] %>% write_csv("~/PhD_Bioinformatics /Supplementary/1.7/ATN1.csv")
+ATN1 <- ATN1[c(4,6)] %>% write_csv("~filepath/filename.csv")
 
 CAMK2D <- filter(PD_SL_PINOT_threshold, Seed == "CAMK2D") 
 CAMK2D$CAMK2D <- 1
-CAMK2D <- CAMK2D[c(4,6)] %>% write_csv("~/PhD_Bioinformatics /Supplementary/1.7/CAMK2D.csv")
+CAMK2D <- CAMK2D[c(4,6)] %>% write_csv("~filepath/filename.csv")
 
 CCAR2 <- filter(PD_SL_PINOT_threshold, Seed == "CCAR2") 
 CCAR2$CCAR2 <-1
-CCAR2 <- CCAR2[c(4,6)] %>% write_csv("~/PhD_Bioinformatics /Supplementary/1.7/CCAR2.csv")
+CCAR2 <- CCAR2[c(4,6)] %>% write_csv("~filepath/filename.csv")
 
 
 CSTA <- filter(PD_SL_PINOT_threshold, Seed == "CSTA") 
 CSTA$CSTA<- 1
-CSTA  <- CSTA [c(4,6)] %>% write_csv("~/PhD_Bioinformatics /Supplementary/1.7/CSTA.csv")
+CSTA  <- CSTA [c(4,6)] %>% write_csv("~filepath/filename.csv")
 
 CYLD <- filter(PD_SL_PINOT_threshold, Seed == "CYLD") 
 CYLD$CYLD <- 1
-CYLD <- CYLD[c(4,6)] %>% write_csv("~/PhD_Bioinformatics /Supplementary/1.7/CYLD.csv")
+CYLD <- CYLD[c(4,6)] %>% write_csv("~filepath/filename.csv")
 
 LRRK2 <- filter(PD_SL_PINOT_threshold, Seed == "LRRK2") 
 LRRK2$LRRK2 <- 1
-LRRK2 <- LRRK2[c(4,6)] %>% write_csv("~/PhD_Bioinformatics /Supplementary/1.7/LRRK2.csv")
+LRRK2 <- LRRK2[c(4,6)] %>% write_csv("~filepath/filename.csv")
 
 MAPT <- filter(PD_SL_PINOT_threshold, Seed == "MAPT") 
 MAPT$MAPT <- 1
-MAPT <-MAPT[c(4,6)] %>% write_csv("~/PhD_Bioinformatics /Supplementary/1.7/MAPT.csv")
+MAPT <-MAPT[c(4,6)] %>% write_csv("~filepath/filename.csv")
 
 PPP2R2B <- filter(PD_SL_PINOT_threshold, Seed == "PPP2R2B")
 PPP2R2B$PPP2R2B <- 1
-PPP2R2B <- PPP2R2B[c(4,6)] %>% write_csv("~/PhD_Bioinformatics /Supplementary/1.7/PPP2R2B.csv")
+PPP2R2B <- PPP2R2B[c(4,6)] %>% write_csv("~filepath/filename.csv")
 
 SETD1A <- filter(PD_SL_PINOT_threshold, Seed == "SETD1A") 
 SETD1A$SETD1A <- 1
-SETD1A <- SETD1A[c(4,6)] %>% write_csv("~/PhD_Bioinformatics /Supplementary/1.7/SETD1A.csv")
+SETD1A <- SETD1A[c(4,6)] %>% write_csv("~filepath/filename.csv")
 
 SGF29 <- filter(PD_SL_PINOT_threshold, Seed == "SGF29") 
 SGF29$SGF29 <- 1
-SGF29 <- SGF29[c(4,6)] %>% write_csv("~/PhD_Bioinformatics /Supplementary/1.7/SGF29.csv")
+SGF29 <- SGF29[c(4,6)] %>% write_csv("~filepath/filename.csv")
 
 UBTF <- filter(PD_SL_PINOT_threshold, Seed == "UBTF") 
 UBTF$UBTF <- 1
-UBTF <- UBTF[c(4,6)] %>% write_csv("~/PhD_Bioinformatics /Supplementary/1.7/UBTF.csv")
+UBTF <- UBTF[c(4,6)] %>% write_csv("~filepath/filename.csv")
 
 VPS35 <- filter(PD_SL_PINOT_threshold, Seed == "VPS35") 
 VPS35$VPS35 <- 1
-VPS35 <- VPS35[c(4,6)] %>% write_csv("~/PhD_Bioinformatics /Supplementary/1.7/VPS35.csv")
+VPS35 <- VPS35[c(4,6)] %>% write_csv("~filepath/filename.csv")
 
 WDR5B <- filter(PD_SL_PINOT_threshold, Seed == "WDR5B") 
 WDR5B$WDR5B <- 1
-WDR5B <- WDR5B[c(4,6)] %>% write_csv("~/PhD_Bioinformatics /Supplementary/1.7/WDR5B.csv")
+WDR5B <- WDR5B[c(4,6)] %>% write_csv("~filepath/filename.csv")
 
 #The following code generates the unique list of SL interactors (EntrezID) (interactome-wide)
 PD_SL_PINOT_threshold <- PD_SL_PINOT_threshold[c(4)]
@@ -98,7 +98,7 @@ Shared_PD_interactors <- merge(Shared_PD_interactors, UBTF, by.x="Interactor", b
 Shared_PD_interactors <- merge(Shared_PD_interactors, VPS35, by.x="Interactor", by.y="EntrezID", all.x=TRUE)
 Shared_PD_interactors <- merge(Shared_PD_interactors, WDR5B, by.x="Interactor", by.y="EntrezID", all.x=TRUE)
 
-readr::write_csv(Shared_PD_interactors, file =("~/PhD_Bioinformatics /Supplementary/1.7/Shared_PD_interactors.csv")) # save results as CSV
+readr::write_csv(Shared_PD_interactors, file =("~filepath/filename.csv")) # save results as CSV
 
 #Instructions outside of rStudio:
 
@@ -106,13 +106,13 @@ readr::write_csv(Shared_PD_interactors, file =("~/PhD_Bioinformatics /Supplement
 #All Interactors in result file > input into g:Profiler search tool:g:GOSt.
 
 #Next lines of code open gProfilerresult.csv, filter for GO terms with <100 terms, assign semantic class and functional group.
-gProfiler_result <- read.csv("~/PhD_Bioinformatics /Supplementary/1.7/gProfilerresult.csv")
+gProfiler_result <- read.csv("~filepath/filename.csv")
 gProfiler_result <- filter(gProfiler_result, term_size < 100) 
-readr::write_csv(gProfiler_result, file =("~/PhD_Bioinformatics /Supplementary/1.7/gProfiler_result_terms<100.csv")) # save results as CSV
+readr::write_csv(gProfiler_result, file =("~filepath/filename.csv")) # save results as CSV
 
 
-semantic_class_library <- read.csv("~/PhD_Bioinformatics /Supplementary/1.7/semantic_classes.csv") #Calls in the 'library' of semantic classes/functional groups- generated by manual assignment to each GO term. 
-gProfiler_result_thresholded <- read.csv("~/PhD_Bioinformatics /Supplementary/1.7/gProfiler_result_terms<100.csv")
+semantic_class_library <- read.csv("~filepath/filename.csv") #Calls in the 'library' of semantic classes/functional groups- generated by manual assignment to each GO term. 
+gProfiler_result_thresholded <- read.csv("~filepath/filename.csv")
 
 gProfiler_sort <-merge (gProfiler_result_thresholded, semantic_class_library, by.x="term_id", by.y="GO.ID", all.x=TRUE) #merges gProfiler data with 'semantic class' table to assign functional block and semantic class.
 
