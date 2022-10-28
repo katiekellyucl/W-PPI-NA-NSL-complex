@@ -6,11 +6,11 @@ Date: 04.02.2022
 
 setwd("~/PhD_Bioinformatics")
 
-dictionary <- read.csv("~/PhD_Bioinformatics /Supplementary/ conversion_table.csv")     #Uploads the dictionary from which the random selections will be made
+dictionary <- read.csv("~filepath/filename.csv")     #Uploads the dictionary (list of 19,947 genes (obtained by processing the file downloaded from HGNC: (https://www.genenames.org/download/statistics-and-files/) on August 2019 (Tomkins, Ferrari et al. 2020)) ) from which the random selections will be made
 dictionary <- dictionary[c(1)]                                                     #Subsets the dictionary to only retain the entrez ID.
 
 
-I <- read.csv("~/PhD_Bioinformatics /Supplementary/ PD_GWAS_Pannelapp_unique_mod.csv")#this is the list you compare your random list of genes to.
+I <- read.csv("~filepath/filename.csv")#this is the list you compare your random list of genes to.
 
 dictionary <- dictionary  #this is the list you randomise. 
 
@@ -19,7 +19,7 @@ i <- 1
 R <- integer()
 
 for (i in 1:100000) {
-  random <- sample(1:19947, 517, replace=FALSE)               #19947 is total number of genes in the dictionary. 517 is the total number of genes in the FL NSL interactome.Here this number can be exchanged for the total number of interactors in the SL interactome. 
+  random <- sample(1:19947, *, replace=FALSE)               #19947 is total number of genes in the dictionary. * should be replaced with the total number of genes in the FL interactome or protein network . 
   ran <- (dictionary[random,])
   v <- merge (ran, I, by.x= 1, by.y= "entrez", all.x=FALSE)
   R[i] <- nrow(v)
